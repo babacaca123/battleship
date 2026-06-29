@@ -18,11 +18,12 @@ function Ship(length){
 
     function isSunk(){
         if (length === getHits()){
-            return true
+            beenSunk = true;
         }
         else{
-            return false
+            beenSunk = false;
         }
+        return beenSunk;
     }
 
 
