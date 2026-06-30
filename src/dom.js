@@ -1,4 +1,4 @@
-import {human, computer} from './state.js'
+import {handleTurn} from "./state.js"
 
 
 
@@ -23,7 +23,10 @@ function renderBoard(gameboard, container){
     
             if (isEnemyBoard) {
                 cell.addEventListener('click', () => {
-                    updateCell(x, y, gameboard, cell, isEnemyBoard);
+                    if (inputLocked) return;
+                    
+                    handleTurn(x, y, gameboard, cell, isEnemyBoard);
+                    
                 });
             }
         }
@@ -61,7 +64,7 @@ function updateCell(x, y, gameboard, cell, isEnemyBoard){
     cell.dataset.x = x;
     cell.dataset.y = y;
 
-
+    
 
     gameboard.receiveAttack(x, y);
 
@@ -77,4 +80,4 @@ function getCellElement(container, x, y){
 
 }
 
-export default renderBoard;
+export {renderBoard, updateCell, getCellElement};

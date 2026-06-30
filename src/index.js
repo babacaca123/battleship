@@ -1,4 +1,4 @@
-import renderBoard from './dom.js'
+import {renderBoard} from './dom.js'
 import { computer, human } from './state.js';
 import './styles.css';
 
@@ -20,3 +20,5 @@ playButton.addEventListener('click', () => {
 
 
 });
+
+// does this not live in state????
