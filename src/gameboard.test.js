@@ -1,6 +1,6 @@
 import {test, expect} from '@jest/globals'
 import Gameboard from "./gameboard.js"
-import Ship from './ship.js'
+
 
 test("placeShip places a ship on the board", () => {
     const gameboard = Gameboard();
@@ -14,7 +14,7 @@ test("receiveAttack takes coordinates and reacts according to coordinate content
     const gameboard = Gameboard();
     gameboard.placeShip(0, 0, 3, 'horizontal');
     gameboard.receiveAttack(0, 0);
-    expect(gameboard.board[0][0].getHits()).toBe(1);
+    expect(gameboard.board[0][0].ship.getHits()).toBe(1);
 
 })
 

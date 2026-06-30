@@ -17,14 +17,14 @@ function Gameboard() {
         if (direction === "horizontal"){
             
             for(let i = 0; i < ship.length; i++){
-                board[x][y] = ship;
+                board[x][y] = { ship, hit: false };
                 x += 1;
             }
         }
         if (direction === "vertical"){
             
             for(let i = 0; i < ship.length; i++){
-                board[x][y] = ship;
+                board[x][y] = { ship, hit: false };
                 y += 1;
             }
         }
@@ -38,7 +38,8 @@ function Gameboard() {
         const ship = board[x][y]
 
         if(ship !== null){
-            ship.hit()
+            board[x][y].hit = true
+            board[x][y].ship.hit()
         }
         else if (ship === null)
         {

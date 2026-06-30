@@ -1,0 +1,45 @@
+#start-screen, #playing-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#playing-screen {
+    display: none;
+    flex-direction: column;
+}
+
+#boards-container {
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+}
+
+#computer-board,
+#player-board{
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+}
+
+.cell {
+    width: 40px;
+    height: 40px;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+.ship-cell {
+    background: gray;
+}
+
+.hit {
+    background: red;
+}
+
+.miss {
+    background: blue;
+}
+.water{
+    background: darkblue;
+}

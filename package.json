@@ -15,7 +15,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/babacaca123/battleship/issues"
   },
@@ -24,8 +23,10 @@
     "@babel/core": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
     "babel-jest": "^30.4.1",
+    "css-loader": "^7.1.4",
     "html-webpack-plugin": "^5.6.7",
     "jest": "^30.4.2",
+    "style-loader": "^4.0.0",
     "webpack": "^5.108.1",
     "webpack-cli": "^7.1.0",
     "webpack-dev-server": "^5.2.5"
