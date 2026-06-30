@@ -5,6 +5,7 @@ import {human, computer} from './state.js'
 
 function renderBoard(gameboard, container){
 
+    console.log('renderboard called')
 
     container.innerHTML = '';
     const computerBoard = document.getElementById('computer-board');
@@ -14,44 +15,33 @@ function renderBoard(gameboard, container){
         for (let x = 0; x < 10; x++) {
             const cell = document.createElement('div');
             cell.classList.add('cell');
-
-            cell.dataset.x = x;
-            cell.dataset.y = y;
-            
             container.appendChild(cell);
-
-            if (container === computerBoard){
+    
+            const isEnemyBoard = (container === computerBoard);
+    
+            renderCellState(x, y, gameboard, cell, isEnemyBoard);
+    
+            if (isEnemyBoard) {
                 cell.addEventListener('click', () => {
-
-                    updateCell(x, y, gameboard, cell);
-                })
+                    updateCell(x, y, gameboard, cell, isEnemyBoard);
+                });
             }
-            
-            
-            
-
         }
     }
-
 }
 
-
-
-function updateCell(x, y, gameboard, cell){
-
+function renderCellState(x, y, gameboard, cell, isEnemyBoard){
     const board = gameboard.board;
     const missedAttacks = gameboard.getMissedAttacks();
     cell.dataset.x = x;
     cell.dataset.y = y;
 
-
-
-    gameboard.receiveAttack(x, y);
-
     const value = board[x][y];
 
 
-                if (value !== null && !value.hit) {
+    cell.className = "cell";
+
+                if (value !== null && !value.hit && !isEnemyBoard) {
                     cell.classList.add('ship-cell');
                 }
                 else if (value !== null && value.hit) {
@@ -63,10 +53,27 @@ function updateCell(x, y, gameboard, cell){
                 else{
                     cell.classList.add('water');
                 }
+}
 
+function updateCell(x, y, gameboard, cell, isEnemyBoard){
 
     
-    console.log(missedAttacks);
+    cell.dataset.x = x;
+    cell.dataset.y = y;
+
+
+
+    gameboard.receiveAttack(x, y);
+
+    renderCellState(x,y, gameboard, cell, isEnemyBoard);
+    
+
+}
+
+
+function getCellElement(container, x, y){
+    
+    return container.querySelector(`[data-x="${x}"][data-y="${y}"]`)
 
 }
 

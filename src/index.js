@@ -10,10 +10,13 @@ const playingScreen = document.getElementById('playing-screen')
 playButton.addEventListener('click', () => {
 
     document.getElementById('start-screen').style.display = 'none';
+    playingScreen.style.display = 'flex';
     renderBoard(human.gameboard, document.getElementById('player-board'));
     renderBoard(computer.gameboard, document.getElementById('computer-board'));
     
-    playingScreen.style.display = 'flex';
+    
+    
+    
 
 
 });
