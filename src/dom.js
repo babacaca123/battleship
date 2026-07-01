@@ -42,15 +42,21 @@ function renderBoard(gameboard, container){
                     
                     event.preventDefault();
                     const length =  Number(event.dataTransfer.getData('shipLength'))
-                    human.gameboard.placeShip(x, y, length, "vertical");
+                    const success = human.gameboard.placeShip(x, y, length, "vertical");
 
-                    const placedShip = document.getElementById(event.dataTransfer.getData('cellId'))
+
+                    if (success){
+
+                        const placedShip = document.getElementById(event.dataTransfer.getData('cellId'))
                     
-                    placedShip.remove()
+                        placedShip.remove()
 
-                    checkAllShipsPlaced(shipContainer);
+                    
 
-                    renderBoard(human.gameboard, document.getElementById('player-board'));
+                        renderBoard(human.gameboard, document.getElementById('player-board'));
+                        checkAllShipsPlaced(shipContainer);
+                    }
+                    
 
                    
                  });

@@ -82,7 +82,7 @@ function handleTurn(x, y, gameboard, cell, isEnemyBoard){
 
     updateCell(x, y, gameboard, cell, isEnemyBoard);
     const result = (gameboard.board[x][y] !== null) ? "HIT" : "MISS";
-    log.push(`Player attacked (${x},${y}) - ${result}`)
+    log.push(`Player attacked (${x + 1},${y + 1}) - ${result}`)
     renderLogEntry(log[log.length - 1])
 
     inputLocked = true;
@@ -97,7 +97,7 @@ function handleTurn(x, y, gameboard, cell, isEnemyBoard){
 
     setTimeout(() => {
         const computerAttack = computerMove(human.gameboard, document.getElementById('player-board'));
-        log.push(`Computer attacked (${computerAttack.x},${computerAttack.y}) - ${computerAttack.result}`)
+        log.push(`Computer attacked (${computerAttack.x + 1},${computerAttack.y + 1}) - ${computerAttack.result}`)
         renderLogEntry(log[log.length - 1])
 
         if(human.gameboard.allSunk()){
