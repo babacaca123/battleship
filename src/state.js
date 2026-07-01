@@ -12,6 +12,7 @@ const human = Player('player');
 const computer = Player('computer');
 
 let inputLocked = false;
+let gameOver = false;
 
 const winnerPopup = document.getElementById('win-lose-popup');
 const winnerText = winnerPopup.children[0]
@@ -48,6 +49,8 @@ function computerMove(gameboard, container){
 
 function handleTurn(x, y, gameboard, cell, isEnemyBoard){
 
+    if (gameOver) return;
+
     updateCell(x, y, gameboard, cell, isEnemyBoard);
 
     inputLocked = true;
@@ -55,28 +58,22 @@ function handleTurn(x, y, gameboard, cell, isEnemyBoard){
     if(computer.gameboard.allSunk()){
 
         winnerPopup.style.display = 'block';
+        gameOver = true;
     }
 
+    if (gameOver) return;
+
     setTimeout(() => {
-        computerMove(human.gameboard, !isEnemyBoard);
+        computerMove(human.gameboard, document.getElementById('player-board'));
 
         if(human.gameboard.allSunk()){
 
             winnerPopup.style.display = 'block';
             winnerText.textContent = 'You Lost lol!'
+            gameOver = true;
         }
         inputLocked = false;
       }, 2000);
-
-   
-
-    
-
-    
-
-
-
-
 
 }
 
@@ -100,4 +97,4 @@ computer.gameboard.receiveAttack(3, 2);
 human.gameboard.receiveAttack(1, 1);
 human.gameboard.receiveAttack(1, 2);
 
-export { human, computer, handleTurn };
+export { human, computer, handleTurn, inputLocked };

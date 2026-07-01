@@ -1,4 +1,4 @@
-import {handleTurn} from "./state.js"
+import {handleTurn, inputLocked} from "./state.js"
 
 
 
@@ -77,6 +77,7 @@ function updateCell(x, y, gameboard, cell, isEnemyBoard){
 function getCellElement(container, x, y){
     
     return container.querySelector(`[data-x="${x}"][data-y="${y}"]`)
+    
 
 }
 
