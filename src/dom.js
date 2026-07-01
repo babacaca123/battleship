@@ -4,6 +4,7 @@ import { shipContainer } from "./index.js";
 
 
 const CELL_SIZE = 42;
+let draggedShipLength = null;
 
 function renderBoard(gameboard, container){
 
@@ -33,16 +34,33 @@ function renderBoard(gameboard, container){
             }
             if(!isEnemyBoard){
 
+                
+               
+
+                
+        
+
                 cell.addEventListener('dragover', (event) => {
                     
                      event.preventDefault();
-                    
+                     if (draggedShipLength === null) return;
+                       const direction = event.shiftKey ? 'horizontal' : 'vertical';
+                        clearGhostCells(container);
+                       showGhostCells(container, x, y, draggedShipLength, direction);
                   });
+                
+                  cell.addEventListener('dragleave', (event) => {
+                    cell.style.backgroundColor = ''; // reset when cursor leaves this cell
+                });
+
                 cell.addEventListener('drop', (event) => {
+
+                    
                     
                     event.preventDefault();
                     const length =  Number(event.dataTransfer.getData('shipLength'))
-                    const success = human.gameboard.placeShip(x, y, length, "vertical");
+                    const direction = event.shiftKey ? 'horizontal' : 'vertical';
+                    const success = human.gameboard.placeShip(x, y, length, direction);
 
 
                     if (success){
@@ -146,6 +164,8 @@ function renderShipPieces(container, shipLengths) {
             
                     event.dataTransfer.setData('shipLength', length);
                     event.dataTransfer.setData('cellId', cellId);
+                    event.target.style.opacity = '0.7';
+                    draggedShipLength = length;
                     
                     
                     event.target.style.opacity = '0.7';
@@ -154,6 +174,8 @@ function renderShipPieces(container, shipLengths) {
                   
                   shipDiv.addEventListener('dragend', (event) => {
                     event.target.style.opacity = '1';
+                    draggedShipLength = null;
+                    clearGhostCells(document.getElementById('player-board'));
                 });
                   
 
@@ -168,6 +190,24 @@ function renderShipPieces(container, shipLengths) {
 function renderShipContainer(container, shipLengths) {
     renderShipContainerBackground(container, 8, 4);
     renderShipPieces(container, shipLengths);
+}
+
+
+function clearGhostCells(container) {
+    container.querySelectorAll('.ghost-cell').forEach(cell => {
+        cell.classList.remove('ghost-cell');
+    });
+}
+
+function showGhostCells(container, x, y, length, direction) {
+    for (let i = 0; i < length; i++) {
+        const cx = direction === 'horizontal' ? x + i : x;
+        const cy = direction === 'vertical' ? y + i : y;
+        const ghostCell = getCellElement(container, cx, cy);
+        if (ghostCell) {
+            ghostCell.classList.add('ghost-cell');
+        }
+    }
 }
 
 function updateCell(x, y, gameboard, cell, isEnemyBoard){

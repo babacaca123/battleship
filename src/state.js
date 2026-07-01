@@ -16,11 +16,11 @@ let inputLocked = true;
 let gameOver = false;
 const log = [];
 
+
 const winnerPopup = document.getElementById('win-lose-popup');
 const winnerText = winnerPopup.children[0]
 
 const SHIP_LENGTHS = [5, 4, 3, 3, 2];
-
 
 
 

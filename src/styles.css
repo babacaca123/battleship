@@ -92,3 +92,7 @@ body {
     background: darkblue;
     border: 1px solid black;
 }
+.ghost-cell {
+    outline: 3px solid limegreen;
+    outline-offset: -3px;
+}
