@@ -1,5 +1,6 @@
-import {handleTurn, human, inputLocked} from "./state.js"
+import {handleTurn, human, inputLocked, checkAllShipsPlaced} from "./state.js"
 import Gameboard from "./gameboard.js";
+import { shipContainer } from "./index.js";
 
 
 const CELL_SIZE = 42;
@@ -46,6 +47,8 @@ function renderBoard(gameboard, container){
                     const placedShip = document.getElementById(event.dataTransfer.getData('cellId'))
                     
                     placedShip.remove()
+
+                    checkAllShipsPlaced(shipContainer);
 
                     renderBoard(human.gameboard, document.getElementById('player-board'));
 

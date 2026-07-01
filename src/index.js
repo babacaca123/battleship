@@ -1,5 +1,5 @@
 import {renderBoard, renderShipContainer} from './dom.js'
-import { computer, human, SHIP_LENGTHS, shipsPlaced } from './state.js';
+import { computer, human, SHIP_LENGTHS } from './state.js';
 import './styles.css';
 
 

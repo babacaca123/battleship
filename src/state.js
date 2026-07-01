@@ -12,7 +12,7 @@ const gameboard = Gameboard();
 const human = Player('player');
 const computer = Player('computer');
 
-let inputLocked = false;
+let inputLocked = true;
 let gameOver = false;
 const log = [];
 
@@ -61,15 +61,14 @@ function computerMove(gameboard, container){
     return {x , y, result}
 }
 
-function shipsPlaced(container){
+function checkAllShipsPlaced(shipContainer){
 
     const hasShips = !!shipContainer.querySelector('.ship-piece')
 
-    while (hasShips){
-        inputLocked = true;
+    if (!hasShips) {
+        shipContainer.style.display = 'none';
+        inputLocked = false;
     }
-    inputLocked = false
-    shipContainer.remove();
 
 }
 
@@ -121,4 +120,4 @@ gameboard.computerPlaceShips(computer.gameboard);
 
 
 
-export { human, computer, handleTurn, inputLocked, SHIP_LENGTHS, shipsPlaced };
+export { human, computer, handleTurn, inputLocked, SHIP_LENGTHS, checkAllShipsPlaced };
