@@ -18,6 +18,16 @@ const log = [];
 const winnerPopup = document.getElementById('win-lose-popup');
 const winnerText = winnerPopup.children[0]
 
+const SHIP_LENGTHS = [5, 4, 3, 3, 2];
+
+
+
+
+
+
+
+
+
 
 function computerMove(gameboard, container){
 
@@ -95,11 +105,11 @@ function handleTurn(x, y, gameboard, cell, isEnemyBoard){
 
 
 
-human.gameboard.placeShip(2, 7, 3, "vertical");
+human.gameboard.placeShip(6, 3, 3, "vertical");
 
 computer.gameboard.placeShip(3, 2, 2, "horizontal");
 
-human.gameboard.placeShip(1, 1, 5, "horizontal");
+human.gameboard.placeShip(5, 1, 5, "horizontal");
 
 computer.gameboard.placeShip(6, 5, 2, "horizontal");
 

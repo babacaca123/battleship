@@ -16,6 +16,36 @@ function Gameboard() {
 
         if (direction === "horizontal"){
             
+            if(x + length - 1 > 9){
+                console.log('ship exceeds board')
+                return false;
+                
+            }
+            for(let i = 0; i < ship.length; i++){
+                if(board[x + i][y] !== null){
+                    console.log('ships overlap')
+                    return false;
+                }
+            }
+        }
+        if (direction === "vertical"){
+            
+            if(y + length - 1 > 9){
+                console.log('ship exceeds board')
+                return false;
+            }
+            for(let i = 0; i < ship.length; i++){
+                if(board[x][y + i] !== null){
+                    console.log('ships overlap')
+                    return false;
+                }
+            }
+        }
+
+
+
+        if (direction === "horizontal"){
+            
             for(let i = 0; i < ship.length; i++){
                 board[x][y] = { ship, hit: false };
                 x += 1;
