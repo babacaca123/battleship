@@ -1,6 +1,7 @@
 import Gameboard from "./gameboard.js"
 import Player from "./player.js"
 import { renderLogEntry, updateCell, getCellElement} from "./dom.js";
+import { shipContainer } from "./index.js";
 
 
 
@@ -19,6 +20,7 @@ const winnerPopup = document.getElementById('win-lose-popup');
 const winnerText = winnerPopup.children[0]
 
 const SHIP_LENGTHS = [5, 4, 3, 3, 2];
+
 
 
 
@@ -59,7 +61,17 @@ function computerMove(gameboard, container){
     return {x , y, result}
 }
 
+function shipsPlaced(container){
 
+    const hasShips = !!shipContainer.querySelector('.ship-piece')
+
+    while (hasShips){
+        inputLocked = true;
+    }
+    inputLocked = false
+    shipContainer.remove();
+
+}
 
 
 function handleTurn(x, y, gameboard, cell, isEnemyBoard){
@@ -104,20 +116,9 @@ function handleTurn(x, y, gameboard, cell, isEnemyBoard){
 
 
 
+gameboard.computerPlaceShips(computer.gameboard);
 
-human.gameboard.placeShip(6, 3, 3, "vertical");
 
-computer.gameboard.placeShip(3, 2, 2, "horizontal");
 
-human.gameboard.placeShip(5, 1, 5, "horizontal");
 
-computer.gameboard.placeShip(6, 5, 2, "horizontal");
-
-computer.gameboard.receiveAttack(1, 1);
-computer.gameboard.receiveAttack(1, 2);
-computer.gameboard.receiveAttack(6, 5);
-computer.gameboard.receiveAttack(3, 2);
-human.gameboard.receiveAttack(1, 1);
-human.gameboard.receiveAttack(1, 2);
-
-export { human, computer, handleTurn, inputLocked };
+export { human, computer, handleTurn, inputLocked, SHIP_LENGTHS, shipsPlaced };

@@ -1,10 +1,11 @@
-import {renderBoard} from './dom.js'
-import { computer, human } from './state.js';
+import {renderBoard, renderShipContainer} from './dom.js'
+import { computer, human, SHIP_LENGTHS, shipsPlaced } from './state.js';
 import './styles.css';
 
 
 const playButton = document.getElementById('play-btn');
 const playingScreen = document.getElementById('playing-screen')
+export const shipContainer = document.getElementById('ship-container')
 
 
 
@@ -14,6 +15,8 @@ playButton.addEventListener('click', () => {
     playingScreen.style.display = 'flex';
     renderBoard(human.gameboard, document.getElementById('player-board'));
     renderBoard(computer.gameboard, document.getElementById('computer-board'));
+    renderShipContainer(shipContainer, SHIP_LENGTHS);
+    // shipsPlaced(shipContainer);
     
     
     

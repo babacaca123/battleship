@@ -21,6 +21,9 @@
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(10, 1fr);
 }
+#ship-container{
+    
+}
 
 #win-lose-popup {
     display: none;
@@ -72,6 +75,11 @@ body {
 .ship-cell {
     background: gray;
 }
+.ship-piece{
+    background: gray; 
+    border: 1px solid black; 
+    box-sizing: border-box;
+}
 
 .hit {
     background: red;
@@ -82,4 +90,5 @@ body {
 }
 .water{
     background: darkblue;
+    border: 1px solid black;
 }

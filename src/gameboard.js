@@ -1,4 +1,5 @@
 import Ship from './ship.js'
+import { SHIP_LENGTHS } from './state.js';
 
 
 
@@ -16,7 +17,7 @@ function Gameboard() {
 
         if (direction === "horizontal"){
             
-            if(x + length - 1 > 9){
+            if (x < 0 || x + length - 1 > 9 || y < 0 || y > 9){
                 console.log('ship exceeds board')
                 return false;
                 
@@ -30,7 +31,7 @@ function Gameboard() {
         }
         if (direction === "vertical"){
             
-            if(y + length - 1 > 9){
+            if (y < 0 || y + length - 1 > 9 || x < 0 || x > 9){
                 console.log('ship exceeds board')
                 return false;
             }
@@ -42,7 +43,7 @@ function Gameboard() {
             }
         }
 
-
+        
 
         if (direction === "horizontal"){
             
@@ -60,7 +61,20 @@ function Gameboard() {
         }
 
         ships.push(ship);
+        return true;
 
+    }
+
+    function computerPlaceShips(gameboard) {
+        SHIP_LENGTHS.forEach(length => {
+            let placed = false;
+            while (!placed) {
+                const x = Math.floor(Math.random() * 10);
+                const y = Math.floor(Math.random() * 10);
+                const direction = Math.random() < 0.5 ? "horizontal" : "vertical";
+                placed = gameboard.placeShip(x, y, length, direction);
+            }
+        });
     }
 
     function receiveAttack(x, y){
@@ -88,7 +102,7 @@ function Gameboard() {
     }
 
 
-    return { board, placeShip, receiveAttack, getMissedAttacks, allSunk }
+    return { board, placeShip, receiveAttack, getMissedAttacks, allSunk, computerPlaceShips }
 }
 
 

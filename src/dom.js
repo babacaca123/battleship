@@ -1,7 +1,8 @@
-import {handleTurn, inputLocked} from "./state.js"
+import {handleTurn, human, inputLocked} from "./state.js"
+import Gameboard from "./gameboard.js";
 
 
-
+const CELL_SIZE = 42;
 
 function renderBoard(gameboard, container){
 
@@ -28,6 +29,29 @@ function renderBoard(gameboard, container){
                     handleTurn(x, y, gameboard, cell, isEnemyBoard);
                     
                 });
+            }
+            if(!isEnemyBoard){
+
+                cell.addEventListener('dragover', (event) => {
+                    
+                     event.preventDefault();
+                    
+                  });
+                cell.addEventListener('drop', (event) => {
+                    
+                    event.preventDefault();
+                    const length =  Number(event.dataTransfer.getData('shipLength'))
+                    human.gameboard.placeShip(x, y, length, "vertical");
+
+                    const placedShip = document.getElementById(event.dataTransfer.getData('cellId'))
+                    
+                    placedShip.remove()
+
+                    renderBoard(human.gameboard, document.getElementById('player-board'));
+
+                   
+                 });
+                
             }
         }
     }
@@ -56,6 +80,85 @@ function renderCellState(x, y, gameboard, cell, isEnemyBoard){
                 else{
                     cell.classList.add('water');
                 }
+}
+
+
+function renderShipContainerBackground(container, rows, cols) {
+    container.innerHTML = '';
+    container.style.position = 'relative';
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = `repeat(${cols}, ${CELL_SIZE}px)`;
+    container.style.gridTemplateRows = `repeat(${rows}, ${CELL_SIZE}px)`;
+    for (let i = 0; i < rows * cols; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('water');
+        container.appendChild(cell);
+    }
+}
+
+
+function renderShipPieces(container, shipLengths) {
+    const rows = 8;
+    const cols = 4;
+    const tempGrid = Array(cols).fill(null).map(() => Array(rows).fill(null));
+
+    function isValidPlacement(col, row, length) {
+        if (row + length - 1 > rows - 1) return false;
+        for (let i = 0; i < length; i++) {
+            if (tempGrid[col][row + i] !== null) return false;
+        }
+        return true;
+    }
+
+    shipLengths.forEach(length => {
+        let placed = false;
+        while (!placed) {
+            const col = Math.floor(Math.random() * cols);
+            const row = Math.floor(Math.random() * rows);
+            if (isValidPlacement(col, row, length)) {
+                for (let i = 0; i < length; i++) {
+                    tempGrid[col][row + i] = length; // mark occupied
+                }
+                const shipDiv = document.createElement('div');
+                shipDiv.classList.add('ship-piece');
+                shipDiv.draggable = true;
+                shipDiv.dataset.length = length;
+                shipDiv.style.position = 'absolute';
+                shipDiv.style.width = `${CELL_SIZE}px`;
+                shipDiv.style.height = `${length * CELL_SIZE}px`;
+                shipDiv.style.top = `${row * CELL_SIZE}px`;
+                shipDiv.style.left = `${col * CELL_SIZE}px`;
+
+                const cellId = crypto.randomUUID();
+                shipDiv.id = cellId;
+
+
+                shipDiv.addEventListener('dragstart', (event) => {
+            
+                    event.dataTransfer.setData('shipLength', length);
+                    event.dataTransfer.setData('cellId', cellId);
+                    
+                    
+                    event.target.style.opacity = '0.7';
+                });
+                  
+                  
+                  shipDiv.addEventListener('dragend', (event) => {
+                    event.target.style.opacity = '1';
+                });
+                  
+
+                container.appendChild(shipDiv);
+                placed = true;
+            }
+        }
+        
+    });
+}
+
+function renderShipContainer(container, shipLengths) {
+    renderShipContainerBackground(container, 8, 4);
+    renderShipPieces(container, shipLengths);
 }
 
 function updateCell(x, y, gameboard, cell, isEnemyBoard){
@@ -90,4 +193,4 @@ function renderLogEntry(entry) {
     logContainer.scrollTop = logContainer.scrollHeight;
 }
 
-export {renderBoard, updateCell, getCellElement, renderLogEntry};
+export {renderBoard, updateCell, getCellElement, renderLogEntry, renderShipContainer};
