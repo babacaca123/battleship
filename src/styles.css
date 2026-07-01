@@ -21,8 +21,26 @@
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(10, 1fr);
 }
+
 #win-lose-popup{
     display: none;
+}
+#game-log {
+    width: 250px;
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
+  }
+body { 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.subcontainer{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
 }
 
 .cell {

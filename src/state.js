@@ -1,6 +1,6 @@
 import Gameboard from "./gameboard.js"
 import Player from "./player.js"
-import { renderBoard, updateCell, getCellElement} from "./dom.js";
+import { renderLogEntry, updateCell, getCellElement} from "./dom.js";
 
 
 
@@ -13,6 +13,7 @@ const computer = Player('computer');
 
 let inputLocked = false;
 let gameOver = false;
+const log = [];
 
 const winnerPopup = document.getElementById('win-lose-popup');
 const winnerText = winnerPopup.children[0]
@@ -42,6 +43,10 @@ function computerMove(gameboard, container){
 
     const cell = getCellElement(container, x, y);
     updateCell(x, y, gameboard, cell, false);
+
+
+    const result = (gameboard.board[x][y] !== null) ? "HIT" : "MISS";
+    return {x , y, result}
 }
 
 
@@ -49,9 +54,15 @@ function computerMove(gameboard, container){
 
 function handleTurn(x, y, gameboard, cell, isEnemyBoard){
 
+    
+    
+
     if (gameOver) return;
 
     updateCell(x, y, gameboard, cell, isEnemyBoard);
+    const result = (gameboard.board[x][y] !== null) ? "HIT" : "MISS";
+    log.push(`Player attacked (${x},${y}) - ${result}`)
+    renderLogEntry(log[log.length - 1])
 
     inputLocked = true;
 
@@ -64,7 +75,9 @@ function handleTurn(x, y, gameboard, cell, isEnemyBoard){
     if (gameOver) return;
 
     setTimeout(() => {
-        computerMove(human.gameboard, document.getElementById('player-board'));
+        const computerAttack = computerMove(human.gameboard, document.getElementById('player-board'));
+        log.push(`Computer attacked (${computerAttack.x},${computerAttack.y}) - ${computerAttack.result}`)
+        renderLogEntry(log[log.length - 1])
 
         if(human.gameboard.allSunk()){
 

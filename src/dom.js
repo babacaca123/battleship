@@ -81,4 +81,13 @@ function getCellElement(container, x, y){
 
 }
 
-export {renderBoard, updateCell, getCellElement};
+
+function renderLogEntry(entry) {
+    const logContainer = document.getElementById('game-log');
+    const entryEl = document.createElement('div'); // or 'p', or 'li' if it's a <ul>
+    entryEl.textContent = entry;
+    logContainer.appendChild(entryEl);
+    logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+export {renderBoard, updateCell, getCellElement, renderLogEntry};
