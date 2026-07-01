@@ -22,8 +22,27 @@
     grid-template-rows: repeat(10, 1fr);
 }
 
-#win-lose-popup{
+#win-lose-popup {
     display: none;
+    position: fixed;
+    top: 250px;
+    left: 40%;
+    width: 200px;
+    height: 100px;
+    z-index: 1000;
+    background: rgb(255, 255, 255);
+    justify-content: center;
+    align-items: center;
+  }
+#win-lose-popup > h1 {
+    display: flex;
+    align-self: center;
+    justify-self: center;
+}
+#win-lose-popup > button {
+    display: flex;
+    align-self: center;
+    justify-self: center;
 }
 #game-log {
     width: 250px;

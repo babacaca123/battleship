@@ -7,6 +7,7 @@ const playButton = document.getElementById('play-btn');
 const playingScreen = document.getElementById('playing-screen')
 
 
+
 playButton.addEventListener('click', () => {
 
     document.getElementById('start-screen').style.display = 'none';
@@ -20,5 +21,7 @@ playButton.addEventListener('click', () => {
 
 
 });
+
+
 
 // does this not live in state????
