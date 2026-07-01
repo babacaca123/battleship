@@ -3,6 +3,10 @@
     justify-content: center;
     align-items: center;
 }
+#start-screen{
+    display: flex;
+    flex-direction: column;
+}
 
 #playing-screen {
     display: none;

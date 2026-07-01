@@ -58,7 +58,8 @@ function computerMove(gameboard, container){
 
 
     const result = (gameboard.board[x][y] !== null) ? "HIT" : "MISS";
-    return {x , y, result}
+    const sunk = (result === "HIT") && gameboard.board[x][y].ship.isSunk();
+    return {x , y, result, sunk}
 }
 
 function checkAllShipsPlaced(shipContainer){
@@ -75,14 +76,22 @@ function checkAllShipsPlaced(shipContainer){
 
 function handleTurn(x, y, gameboard, cell, isEnemyBoard){
 
-    
+    const alreadyAttacked = gameboard.board[x][y] !== null && gameboard.board[x][y].hit ||
+                             gameboard.getMissedAttacks().some(a => a.x === x && a.y === y);
+    if (alreadyAttacked) return;
     
 
     if (gameOver) return;
 
     updateCell(x, y, gameboard, cell, isEnemyBoard);
     const result = (gameboard.board[x][y] !== null) ? "HIT" : "MISS";
-    log.push(`Player attacked (${x + 1},${y + 1}) - ${result}`)
+    let logLine = (`Player attacked (${x + 1},${y + 1}) - ${result}`)
+    if (result === "HIT" && gameboard.board[x][y].ship.isSunk()) {
+        logLine += " - SUNK!";
+    }
+    log.push(logLine);
+
+
     renderLogEntry(log[log.length - 1])
 
     inputLocked = true;
@@ -97,7 +106,8 @@ function handleTurn(x, y, gameboard, cell, isEnemyBoard){
 
     setTimeout(() => {
         const computerAttack = computerMove(human.gameboard, document.getElementById('player-board'));
-        log.push(`Computer attacked (${computerAttack.x + 1},${computerAttack.y + 1}) - ${computerAttack.result}`)
+        const sunkText = computerAttack.sunk ? " - SUNK!" : "";
+        log.push(`Computer attacked (${computerAttack.x + 1},${computerAttack.y + 1}) - ${computerAttack.result}${sunkText}`)
         renderLogEntry(log[log.length - 1])
 
         if(human.gameboard.allSunk()){
@@ -107,7 +117,7 @@ function handleTurn(x, y, gameboard, cell, isEnemyBoard){
             gameOver = true;
         }
         inputLocked = false;
-      }, 1500);
+      }, 1);
 
 }
 
