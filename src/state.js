@@ -118,7 +118,7 @@ function handleTurn(x, y, gameboard, cell, isEnemyBoard){
             gameOver = true;
         }
         inputLocked = false;
-      }, 1500);
+      }, 1);
 
 }
 

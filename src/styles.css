@@ -48,7 +48,7 @@ body::before {
     flex-direction: column;
 }
 
-#start-screen h1, #status-text {
+#start-screen h1, #status-text, #win-lose-popup > h1 {
     font-family: 'Oswald', sans-serif;
     font-weight: 700;
     color: #c9a24b;
@@ -57,7 +57,7 @@ body::before {
     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
-#play-btn {
+#play-btn, #win-lose-popup > button {
     font-family: 'Oswald', sans-serif;
     font-weight: 700;
     background: linear-gradient(#5a5f42, #3c4030);
@@ -74,7 +74,7 @@ body::before {
 
 #boards-container {
     display: flex;
-    gap: 14px;
+    gap: 8px;
     flex-direction: column;
     align-items: center;
 }
@@ -83,11 +83,7 @@ body::before {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    gap: 16px;
-}
-/* the ship-container's row gets extra breathing room, per request */
-.subcontainer:last-of-type {
-    gap: 40px;
+    position: relative;   /* anchor for the absolute side panels */
 }
 
 /* ---------- Boards ---------- */
@@ -251,40 +247,35 @@ body::before {
 /* ---------- Ship tray (pre-placement pieces) ---------- */
 
 #ship-container {
-    position: relative;
-    border-style: solid;
-    border-width: 20px;
-    margin: 14px;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    margin-left: 46px;   /* the "spaced away a bit" gap you wanted */
+    border-radius: 15px;
 }
 #ship-container.hidden {
     visibility: hidden;
 }
 .buoy {
     position: absolute;
-    width: 14px;
-    height: 14px;
-    /* white top, red horizontal band in the middle, white bottom */
+    width: 10px;
+    height: 10px;
     background: linear-gradient(180deg,
-        #f5f5f5 0%, #f5f5f5 38%,
-        #d92b1f 38%, #d92b1f 62%,
-        #f5f5f5 62%, #f5f5f5 100%);
+        #f5f5f5 0%, #f5f5f5 35%,
+        #d92b1f 35%, #d92b1f 65%,
+        #f5f5f5 65%, #f5f5f5 100%);
     border-radius: 50%;
-    transform: translate(-50%, -50%); /* center the buoy on its (left, top) point */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    z-index: 3;
-    animation: buoyBob 2.5s ease-in-out infinite;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    z-index: 4;
 }
 
-/* the mast sticking out the top */
-.buoy::before {
-    content: '';
+.rope {
     position: absolute;
-    left: 50%;
-    top: -6px;
-    width: 2px;
-    height: 6px;
-    background: #f5f5f5;
-    transform: translateX(-50%);
+    height: 2px;
+    background: #c9b58a;             /* rope tan */
+    transform-origin: 0 50%;         /* rotate around the segment's START point */
+    z-index: 3;                      /* under the buoys, over the water */
+    pointer-events: none;
 }
 
 @keyframes buoyBob {
@@ -304,6 +295,10 @@ body::before {
 /* ---------- Game log (terminal) ---------- */
 
 #game-log {
+    position: absolute;
+    left: 100%;        /* starts exactly at the board's right edge */
+    top: 0;
+    margin-left: 16px;
     width: 250px;
     height: 320px;
     overflow-y: auto;
@@ -337,8 +332,8 @@ body::before {
 /* ---------- Status box ---------- */
 
 #status-box {
-    margin-top: 12px;
-    padding: 6px 20px;
+    margin-top: 4px;
+    padding: 2px 14px;
     background: linear-gradient(#3a3d3f, #202224);
     border: 2px solid #55585a;
     border-radius: 4px;
@@ -354,11 +349,12 @@ body::before {
 
 #win-lose-popup {
     display: none;
-    position: fixed;
-    top: 250px;
-    left: 40%;
-    width: 200px;
-    height: 100px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 240px;
+    height: 180px;
     z-index: 1000;
     justify-content: center;
     align-items: center;
@@ -372,7 +368,7 @@ body::before {
     display: flex;
     align-self: center;
     justify-self: center;
-    font-size: 16px;
+    
 }
 #win-lose-popup > button {
     display: flex;

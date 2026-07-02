@@ -115,7 +115,6 @@ function renderCellState(x, y, gameboard, cell, isEnemyBoard){
 
 function renderShipContainerBackground(container, rows, cols) {
     container.innerHTML = '';
-    container.style.position = 'relative';
     container.style.display = 'grid';
     container.style.gridTemplateColumns = `repeat(${cols}, ${CELL_SIZE}px)`;
     container.style.gridTemplateRows = `repeat(${rows}, ${CELL_SIZE}px)`;
@@ -318,29 +317,76 @@ function processLogQueue(){
 }
 
 function renderBuoys(container, rows, cols) {
-    // top + bottom edges: one buoy per column, centered on the column
-    for (let c = 0; c < cols; c++) {
-        const centerX = c * CELL_SIZE + CELL_SIZE / 2;
-        container.appendChild(makeBuoy(centerX, 0));               // top edge
-        container.appendChild(makeBuoy(centerX, rows * CELL_SIZE)); // bottom edge
-    }
-    // left + right edges: one buoy per row
-    for (let r = 0; r < rows; r++) {
-        const centerY = r * CELL_SIZE + CELL_SIZE / 2;
-        container.appendChild(makeBuoy(0, centerY));               // left edge
-        container.appendChild(makeBuoy(cols * CELL_SIZE, centerY)); // right edge
-    }
+    // Build an ORDERED chain of points clockwise around the perimeter,
+    // so each buoy connects to the next one and the loop closes.
+    const points = [];
+    const W = cols * CELL_SIZE;
+    const H = rows * CELL_SIZE;
+
+    for (let c = 0; c < cols; c++) points.push({ x: c * CELL_SIZE + CELL_SIZE / 2, y: 0 });       // top, left→right
+    for (let r = 0; r < rows; r++) points.push({ x: W, y: r * CELL_SIZE + CELL_SIZE / 2 });       // right, top→bottom
+    for (let c = cols - 1; c >= 0; c--) points.push({ x: c * CELL_SIZE + CELL_SIZE / 2, y: H }); // bottom, right→left
+    for (let r = rows - 1; r >= 0; r--) points.push({ x: 0, y: r * CELL_SIZE + CELL_SIZE / 2 }); // left, bottom→top
+
+    const buoys = points.map(p => {
+        const el = document.createElement('div');
+        el.classList.add('buoy');
+        el.style.left = `${p.x}px`;
+        el.style.top = `${p.y}px`;
+        container.appendChild(el);
+        return {
+            el,
+            baseX: p.x,
+            baseY: p.y,
+            phase: Math.random() * Math.PI * 2, // random start point in the wave = independent bobbing
+            offsetY: 0
+        };
+    });
+
+    // one rope segment per buoy, connecting it to the NEXT buoy (loop wraps via %)
+    const ropes = buoys.map(() => {
+        const el = document.createElement('div');
+        el.classList.add('rope');
+        container.appendChild(el);
+        return el;
+    });
+
+    animateBuoys(buoys, ropes);
 }
 
-function makeBuoy(x, y) {
-    const buoy = document.createElement('div');
-    buoy.classList.add('buoy');
-    // position so the buoy's CENTER sits exactly on (x, y)
-    buoy.style.left = `${x}px`;
-    buoy.style.top = `${y}px`;
-    // stagger the bob so they don't all move in sync
-    buoy.style.animationDelay = `-${(Math.random() * 2.5).toFixed(2)}s`;
-    return buoy;
+function animateBuoys(buoys, ropes) {
+    function frame(time) {
+        const t = time / 1000; // ms → seconds
+
+        // 1. move each buoy on its own sine wave
+        buoys.forEach(buoy => {
+            buoy.offsetY = Math.sin(t * 2 + buoy.phase) * 3; // speed 2, amplitude 3px
+            buoy.el.style.transform =
+                `translate(-50%, -50%) translateY(${buoy.offsetY}px)`;
+        });
+
+        // 2. redraw each rope segment between its two buoys' CURRENT positions
+        buoys.forEach((buoy, i) => {
+            const next = buoys[(i + 1) % buoys.length]; // % wraps last→first, closing the loop
+
+            const x1 = buoy.baseX,            y1 = buoy.baseY + buoy.offsetY;
+            const x2 = next.baseX,            y2 = next.baseY + next.offsetY;
+
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const length = Math.hypot(dx, dy);          // distance between the two buoys
+            const angle = Math.atan2(dy, dx);           // angle between them, in radians
+
+            const rope = ropes[i];
+            rope.style.width = `${length}px`;
+            rope.style.left = `${x1}px`;
+            rope.style.top = `${y1}px`;
+            rope.style.transform = `rotate(${angle}rad)`;
+        });
+
+        requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
 }
 
 export {renderBoard, updateCell, getCellElement, renderLogEntry, renderShipContainer};
