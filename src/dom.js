@@ -389,4 +389,43 @@ function animateBuoys(buoys, ropes) {
     requestAnimationFrame(frame);
 }
 
-export {renderBoard, updateCell, getCellElement, renderLogEntry, renderShipContainer};
+function renderExplosion(container) {
+    const explosion = document.createElement('div');
+    explosion.classList.add('explosion');
+
+    // layer 1: instant white flash
+    const flash = document.createElement('div');
+    flash.classList.add('explosion-flash');
+    explosion.appendChild(flash);
+
+    // layer 2: fireball
+    const fireball = document.createElement('div');
+    fireball.classList.add('explosion-fireball');
+    explosion.appendChild(fireball);
+
+    // layer 3: sparks flying outward in random directions
+    for (let i = 0; i < 14; i++) {
+        const spark = document.createElement('div');
+        spark.classList.add('explosion-spark');
+        const angle = Math.random() * Math.PI * 2;          // random direction
+        const distance = 70 + Math.random() * 80;           // random throw distance
+        // hand the trajectory to CSS as variables
+        spark.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+        spark.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+        spark.style.animationDelay = `${Math.random() * 0.1}s`;
+        explosion.appendChild(spark);
+    }
+
+    // layer 4: smoke puffs, slightly offset, rising
+    for (let i = 0; i < 4; i++) {
+        const smoke = document.createElement('div');
+        smoke.classList.add('explosion-smoke');
+        smoke.style.setProperty('--sx', `${(Math.random() - 0.5) * 60}px`);
+        smoke.style.animationDelay = `${0.15 + Math.random() * 0.3}s`;
+        explosion.appendChild(smoke);
+    }
+
+    container.appendChild(explosion);
+}
+
+export {renderBoard, updateCell, getCellElement, renderLogEntry, renderShipContainer, renderExplosion};

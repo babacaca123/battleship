@@ -1,6 +1,6 @@
 import Gameboard from "./gameboard.js"
 import Player from "./player.js"
-import { renderLogEntry, updateCell, getCellElement} from "./dom.js";
+import { renderLogEntry, updateCell, getCellElement, renderExplosion} from "./dom.js";
 
 
 
@@ -18,6 +18,9 @@ const log = [];
 
 const winnerPopup = document.getElementById('win-lose-popup');
 const winnerText = winnerPopup.children[0]
+
+const statusText = document.getElementById('status-text')
+
 
 const SHIP_LENGTHS = [5, 4, 3, 3, 2];
 
@@ -66,9 +69,12 @@ function computerMove(gameboard, container){
 function checkAllShipsPlaced(shipContainer){
 
     const hasShips = !!shipContainer.querySelector('.ship-piece')
+    
 
     if (!hasShips) {
         shipContainer.classList.add('hidden');
+        statusText.textContent = '';
+        statusText.textContent = 'Click anywhere on the enemy board to launch an attack!';
         inputLocked = false;
     }
 
@@ -76,6 +82,8 @@ function checkAllShipsPlaced(shipContainer){
 
 
 function handleTurn(x, y, gameboard, cell, isEnemyBoard){
+
+    statusText.remove()
 
     const alreadyAttacked = gameboard.board[x][y] !== null && gameboard.board[x][y].hit ||
                              gameboard.getMissedAttacks().some(a => a.x === x && a.y === y);
@@ -101,6 +109,7 @@ function handleTurn(x, y, gameboard, cell, isEnemyBoard){
 
         winnerPopup.style.display = 'flex';
         gameOver = true;
+        renderExplosion(document.getElementById('computer-board')); 
     }
 
     if (gameOver) return;
@@ -113,9 +122,10 @@ function handleTurn(x, y, gameboard, cell, isEnemyBoard){
 
         if(human.gameboard.allSunk()){
 
-            winnerPopup.style.display = 'block';
+            winnerPopup.style.display = 'flex';
             winnerText.textContent = 'You Lost lol!'
             gameOver = true;
+            renderExplosion(document.getElementById('player-board')); 
         }
         inputLocked = false;
       }, 1);
