@@ -99,7 +99,7 @@ function handleTurn(x, y, gameboard, cell, isEnemyBoard){
 
     if(computer.gameboard.allSunk()){
 
-        winnerPopup.style.display = 'block';
+        winnerPopup.style.display = 'flex';
         gameOver = true;
     }
 
