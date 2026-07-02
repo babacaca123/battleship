@@ -1,5 +1,5 @@
 import Ship from './ship.js'
-import { SHIP_LENGTHS } from './state.js';
+import { SHIP_LENGTHS, SHIP_SKINS } from './state.js';
 
 
 
@@ -8,12 +8,14 @@ function Gameboard() {
     const board = Array(10).fill(null).map(() => Array(10).fill(null));
     let missedAttacks = [];
     let ships = []
+    let shipPlacements = [];
 
 
-
-    function placeShip(x, y, length, direction){
+    function placeShip(x, y, length, direction, skin){
 
         const ship = Ship(length)
+        const originalX = x;
+        const originalY = y;
 
         if (direction === "horizontal"){
             
@@ -61,18 +63,19 @@ function Gameboard() {
         }
 
         ships.push(ship);
+        shipPlacements.push({ ship, x: originalX, y: originalY, length, direction, skin });
         return true;
 
     }
 
     function computerPlaceShips(gameboard) {
-        SHIP_LENGTHS.forEach(length => {
+        SHIP_LENGTHS.forEach((length, i) => {
             let placed = false;
             while (!placed) {
                 const x = Math.floor(Math.random() * 10);
                 const y = Math.floor(Math.random() * 10);
                 const direction = Math.random() < 0.5 ? "horizontal" : "vertical";
-                placed = gameboard.placeShip(x, y, length, direction);
+                placed = gameboard.placeShip(x, y, length, direction, SHIP_SKINS[i]);
             }
         });
     }
@@ -101,8 +104,12 @@ function Gameboard() {
         return ships.every(ship => ship.isSunk());
     }
 
+    function getShipPlacements(){
+        return shipPlacements;
+    }
 
-    return { board, placeShip, receiveAttack, getMissedAttacks, allSunk, computerPlaceShips }
+
+    return { board, placeShip, receiveAttack, getMissedAttacks, allSunk, computerPlaceShips, getShipPlacements }
 }
 
 

@@ -1,9 +1,9 @@
-import {handleTurn, human, inputLocked, checkAllShipsPlaced} from "./state.js"
-import Gameboard from "./gameboard.js";
+import {handleTurn, human, inputLocked, checkAllShipsPlaced, SHIP_SKINS} from "./state.js"
 import { shipContainer } from "./index.js";
+import Gameboard from "./gameboard.js";
 
 
-const CELL_SIZE = 42;
+const CELL_SIZE = 32;
 let draggedShipLength = null;
 
 function renderBoard(gameboard, container){
@@ -13,6 +13,8 @@ function renderBoard(gameboard, container){
     container.innerHTML = '';
     const computerBoard = document.getElementById('computer-board');
 
+    const isEnemyBoard = (container === computerBoard);
+
 
     for (let y = 9; y >= 0; y--) {
         for (let x = 0; x < 10; x++) {
@@ -20,7 +22,7 @@ function renderBoard(gameboard, container){
             cell.classList.add('cell');
             container.appendChild(cell);
     
-            const isEnemyBoard = (container === computerBoard);
+            
     
             renderCellState(x, y, gameboard, cell, isEnemyBoard);
     
@@ -60,7 +62,8 @@ function renderBoard(gameboard, container){
                     event.preventDefault();
                     const length =  Number(event.dataTransfer.getData('shipLength'))
                     const direction = event.shiftKey ? 'horizontal' : 'vertical';
-                    const success = human.gameboard.placeShip(x, y, length, direction);
+                    const skin = event.dataTransfer.getData('skin');
+                    const success = human.gameboard.placeShip(x, y, length, direction, skin);
 
 
                     if (success){
@@ -82,6 +85,8 @@ function renderBoard(gameboard, container){
             }
         }
     }
+
+    renderShipOverlays(gameboard, container, isEnemyBoard);
 }
 
 function renderCellState(x, y, gameboard, cell, isEnemyBoard){
@@ -95,10 +100,8 @@ function renderCellState(x, y, gameboard, cell, isEnemyBoard){
 
     cell.className = "cell";
 
-                if (value !== null && !value.hit && !isEnemyBoard) {
-                    cell.classList.add('ship-cell');
-                }
-                else if (value !== null && value.hit) {
+                
+                if (value !== null && value.hit) {
                     cell.classList.add('hit');
                 }
                 else if (value === null && missedAttacks.some(attack => attack.x === x && attack.y === y)) {
@@ -124,6 +127,45 @@ function renderShipContainerBackground(container, rows, cols) {
 }
 
 
+function renderShipOverlays(gameboard, container, isEnemyBoard){
+    container.querySelectorAll('.ship-overlay').forEach(el => el.remove());
+
+    const placements = gameboard.getShipPlacements();
+
+    placements.forEach(placement => {
+        const { ship, x, y, length, direction, skin } = placement;
+
+
+        // On the enemy board, only reveal a ship once it's fully sunk
+        if (isEnemyBoard && !ship.isSunk()) return;
+
+        const shipDiv = document.createElement('div');
+        shipDiv.classList.add('ship-overlay');
+        shipDiv.classList.add(`skin-${skin}`);
+        shipDiv.classList.add(direction === 'horizontal' ? 'ship-horizontal' : 'ship-vertical');
+        shipDiv.style.setProperty('--ship-span', `${length * CELL_SIZE}px`);
+
+        if (ship.isSunk()) shipDiv.classList.add('sunk');
+
+        if (direction === 'horizontal') {
+            shipDiv.style.left = `${x * CELL_SIZE}px`;
+            shipDiv.style.top = `${(9 - y) * CELL_SIZE}px`;
+            shipDiv.style.width = `${length * CELL_SIZE}px`;
+            shipDiv.style.height = `${CELL_SIZE}px`;
+        } else {
+            shipDiv.style.left = `${x * CELL_SIZE}px`;
+            shipDiv.style.top = `${(9 - (y + length - 1)) * CELL_SIZE}px`;
+            shipDiv.style.width = `${CELL_SIZE}px`;
+            shipDiv.style.height = `${length * CELL_SIZE}px`;
+        }
+
+        // stagger the bob animation so ships don't all rock in sync
+        shipDiv.style.animationDelay = `-${(Math.random() * 3).toFixed(2)}s`;
+
+        container.appendChild(shipDiv);
+    });
+}
+
 function renderShipPieces(container, shipLengths) {
     const rows = 8;
     const cols = 4;
@@ -137,7 +179,8 @@ function renderShipPieces(container, shipLengths) {
         return true;
     }
 
-    shipLengths.forEach(length => {
+    shipLengths.forEach((length, i) => {
+        const skin = SHIP_SKINS[i];
         let placed = false;
         while (!placed) {
             const col = Math.floor(Math.random() * cols);
@@ -150,6 +193,7 @@ function renderShipPieces(container, shipLengths) {
                 shipDiv.classList.add('ship-piece');
                 shipDiv.draggable = true;
                 shipDiv.dataset.length = length;
+                shipDiv.classList.add(`skin-${skin}`);
                 shipDiv.style.position = 'absolute';
                 shipDiv.style.width = `${CELL_SIZE}px`;
                 shipDiv.style.height = `${length * CELL_SIZE}px`;
@@ -163,6 +207,7 @@ function renderShipPieces(container, shipLengths) {
                 shipDiv.addEventListener('dragstart', (event) => {
             
                     event.dataTransfer.setData('shipLength', length);
+                    event.dataTransfer.setData('skin', skin);
                     event.dataTransfer.setData('cellId', cellId);
                     event.target.style.opacity = '0.7';
                     draggedShipLength = length;
@@ -190,6 +235,7 @@ function renderShipPieces(container, shipLengths) {
 function renderShipContainer(container, shipLengths) {
     renderShipContainerBackground(container, 8, 4);
     renderShipPieces(container, shipLengths);
+    renderBuoys(container, 8, 4);
 }
 
 
@@ -234,12 +280,67 @@ function getCellElement(container, x, y){
 }
 
 
+let logQueue = [];
+let isTypingLog = false;
+
 function renderLogEntry(entry) {
+    logQueue.push(entry);
+    processLogQueue();
+}
+
+
+function processLogQueue(){
+    if (isTypingLog || logQueue.length === 0) return;
+    isTypingLog = true;
+
+    const entry = logQueue.shift();
     const logContainer = document.getElementById('game-log');
-    const entryEl = document.createElement('div'); // or 'p', or 'li' if it's a <ul>
-    entryEl.textContent = entry;
+    const entryEl = document.createElement('div');
+    entryEl.classList.add('log-line', 'typing');
     logContainer.appendChild(entryEl);
-    logContainer.scrollTop = logContainer.scrollHeight;
+
+    let i = 0;
+    const speed = 18; // ms per character
+
+    function typeChar(){
+        if (i < entry.length) {
+            entryEl.textContent += entry.charAt(i);
+            i++;
+            logContainer.scrollTop = logContainer.scrollHeight;
+            setTimeout(typeChar, speed);
+        } else {
+            entryEl.classList.remove('typing');
+            isTypingLog = false;
+            processLogQueue();
+        }
+    }
+    typeChar();
+}
+
+function renderBuoys(container, rows, cols) {
+    // top + bottom edges: one buoy per column, centered on the column
+    for (let c = 0; c < cols; c++) {
+        const centerX = c * CELL_SIZE + CELL_SIZE / 2;
+        container.appendChild(makeBuoy(centerX, 0));               // top edge
+        container.appendChild(makeBuoy(centerX, rows * CELL_SIZE)); // bottom edge
+    }
+    // left + right edges: one buoy per row
+    for (let r = 0; r < rows; r++) {
+        const centerY = r * CELL_SIZE + CELL_SIZE / 2;
+        container.appendChild(makeBuoy(0, centerY));               // left edge
+        container.appendChild(makeBuoy(cols * CELL_SIZE, centerY)); // right edge
+    }
+}
+
+function makeBuoy(x, y) {
+    const buoy = document.createElement('div');
+    buoy.classList.add('buoy');
+    // position so the buoy's CENTER sits exactly on (x, y)
+    buoy.style.left = `${x}px`;
+    buoy.style.top = `${y}px`;
+    // stagger the bob so they don't all move in sync
+    buoy.style.animationDelay = `-${(Math.random() * 2.5).toFixed(2)}s`;
+    return buoy;
 }
 
 export {renderBoard, updateCell, getCellElement, renderLogEntry, renderShipContainer};

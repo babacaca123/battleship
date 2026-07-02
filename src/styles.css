@@ -1,33 +1,356 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Share+Tech+Mono&display=swap');
+
+
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Share Tech Mono', monospace;
+    color: #d8dcd6;
+    background:
+        linear-gradient(115deg, rgba(255,255,255,0.05) 0%, transparent 12%, transparent 88%, rgba(255,255,255,0.04) 100%),
+        radial-gradient(ellipse at 30% 20%, #5a5e60 0%, #34373a 45%, #1a1c1d 100%);
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(100deg, rgba(0,0,0,0.06) 0px, transparent 3px, transparent 80px),
+        repeating-linear-gradient(100deg, rgba(255,255,255,0.03) 0px, transparent 2px, transparent 80px);
+    pointer-events: none;
+    z-index: 0;
+}
+
 #start-screen, #playing-screen {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    z-index: 1;
 }
-#start-screen{
+#start-screen {
     display: flex;
     flex-direction: column;
 }
-
 #playing-screen {
     display: none;
     flex-direction: column;
 }
 
-#boards-container {
-    display: flex;
-    gap: 20px;
-    flex-direction: column;
+#start-screen h1, #status-text {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    color: #c9a24b;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
-#computer-board,
-#player-board{
+#play-btn {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    background: linear-gradient(#5a5f42, #3c4030);
+    color: #e8e4d0;
+    border: 2px solid #1c1d16;
+    padding: 10px 28px;
+    font-size: 18px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #1c1d16, inset 0 0 8px rgba(0,0,0,0.4);
+}
+#play-btn:hover { filter: brightness(1.15); }
+#play-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #1c1d16; }
+
+#boards-container {
+    display: flex;
+    gap: 14px;
+    flex-direction: column;
+    align-items: center;
+}
+
+.subcontainer {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 16px;
+}
+/* the ship-container's row gets extra breathing room, per request */
+.subcontainer:last-of-type {
+    gap: 40px;
+}
+
+/* ---------- Boards ---------- */
+
+#computer-board, #player-board {
     display: grid;
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(10, 1fr);
+    position: relative;
+    border: 3px solid #3a3d3f;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.4);
+    overflow: hidden;
 }
-#ship-container{
-    
+
+/* Player board + ship tray: animated ocean */
+#player-board, #ship-container {
+    background-image:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.05) 0, transparent 40%),
+        linear-gradient(120deg, #0a3d62, #1e5f8c, #0a3d62, #123a52);
+    background-size: 200% 200%;
+    animation: waterMove 8s ease-in-out infinite;
 }
+
+@keyframes waterMove {
+    0%   { background-position: 0% 0%; }
+    50%  { background-position: 100% 60%; }
+    100% { background-position: 0% 0%; }
+}
+
+/* Enemy board: radar scope */
+#computer-board {
+    background:
+        repeating-radial-gradient(circle at center, rgba(70,255,120,0.08) 0px, rgba(70,255,120,0.08) 1px, transparent 1px, transparent 42px),
+        radial-gradient(circle at center, #0d1f13 0%, #04120a 70%, #010604 100%);
+}
+
+#computer-board::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150%;
+    height: 150%;
+    background: conic-gradient(from 0deg, rgba(80,255,140,0.55) 0deg, rgba(80,255,140,0) 60deg);
+    transform: translate(-50%, -50%) rotate(0deg);
+    animation: radarSweep 4s linear infinite;
+    transform-origin: center center;
+    pointer-events: none;
+    z-index: 0;
+    mix-blend-mode: screen;
+}
+
+#computer-board::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    animation: radarPulse 4s ease-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+@keyframes radarSweep {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes radarPulse {
+    0%, 6%, 16%, 100% { box-shadow: inset 0 0 0 0 rgba(80,255,140,0); }
+    3%  { box-shadow: inset 0 0 30px 6px rgba(80,255,140,0.35); }
+    13% { box-shadow: inset 0 0 30px 6px rgba(80,255,140,0.35); }
+}
+
+/* ---------- Cells ---------- */
+
+.cell {
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+}
+
+.water {
+    background: transparent;
+}
+
+.hit {
+    z-index: 2;
+    background: radial-gradient(circle, #ff5b3a 0%, #b3220f 55%, transparent 75%);
+    box-shadow: 0 0 10px rgba(255,60,20,0.6);
+}
+
+.miss {
+    z-index: 2;
+    background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.15) 60%, transparent 70%);
+}
+
+.ghost-cell {
+    outline: 3px solid limegreen;
+    outline-offset: -3px;
+    z-index: 3;
+}
+
+/* ---------- Ship overlays (drawn on top of the grid) ---------- */
+
+.ship-overlay {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    animation: shipBob 3s ease-in-out infinite;
+}
+
+/* the image lives on a ::before so we can rotate it for horizontal ships
+   without rotating the overlay's bounding box (which would break positioning) */
+.ship-overlay::before {
+    content: '';
+    position: absolute;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6));
+}
+
+/* vertical: image fills the overlay directly */
+.ship-overlay.ship-vertical::before {
+    inset: 0;
+}
+
+/* horizontal: draw the image at VERTICAL dimensions, centered, then rotate 90° */
+.ship-overlay.ship-horizontal::before {
+    width: 32px;
+    height: var(--ship-span);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+
+/* board overlays */
+.ship-overlay.skin-ship-5::before   { background-image: url('./assets/carrier.png'); }
+.ship-overlay.skin-ship-4::before   { background-image: url('./assets/battleship.png'); }
+.ship-overlay.skin-submarine::before{ background-image: url('./assets/submarine.png'); }
+.ship-overlay.skin-cruiser::before  { background-image: url('./assets/cruiser.png'); }
+.ship-overlay.skin-ship-2::before   { background-image: url('./assets/destroyer.png'); }
+
+/* tray pieces */
+.ship-piece.skin-ship-5   { background-image: url('./assets/carrier.png'); }
+.ship-piece.skin-ship-4   { background-image: url('./assets/battleship.png'); }
+.ship-piece.skin-submarine{ background-image: url('./assets/submarine.png'); }
+.ship-piece.skin-cruiser  { background-image: url('./assets/cruiser.png'); }
+.ship-piece.skin-ship-2   { background-image: url('./assets/destroyer.png'); }
+
+.ship-overlay.sunk {
+    filter: grayscale(1) brightness(0.4);
+    animation: none;
+}
+
+@keyframes shipBob {
+    0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+    50%      { transform: translateY(2px) rotate(1.5deg); }
+}
+
+/* ---------- Ship tray (pre-placement pieces) ---------- */
+
+#ship-container {
+    position: relative;
+    border-style: solid;
+    border-width: 20px;
+    margin: 14px;
+}
+#ship-container.hidden {
+    visibility: hidden;
+}
+.buoy {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    /* white top, red horizontal band in the middle, white bottom */
+    background: linear-gradient(180deg,
+        #f5f5f5 0%, #f5f5f5 38%,
+        #d92b1f 38%, #d92b1f 62%,
+        #f5f5f5 62%, #f5f5f5 100%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%); /* center the buoy on its (left, top) point */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    z-index: 3;
+    animation: buoyBob 2.5s ease-in-out infinite;
+}
+
+/* the mast sticking out the top */
+.buoy::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -6px;
+    width: 2px;
+    height: 6px;
+    background: #f5f5f5;
+    transform: translateX(-50%);
+}
+
+@keyframes buoyBob {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50%      { transform: translate(-50%, -55%) translateY(1px); }
+}
+
+.ship-piece {
+    box-sizing: border-box;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6));
+    animation: shipBob 3s ease-in-out infinite;
+    cursor: grab;
+}
+
+/* ---------- Game log (terminal) ---------- */
+
+#game-log {
+    width: 250px;
+    height: 320px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    background: #04120a;
+    border: 2px solid #1c2b20;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: 'Share Tech Mono', monospace;
+    color: #4dff8a;
+    font-size: 13px;
+    line-height: 1.4;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.7), 0 0 8px rgba(77,255,138,0.15);
+}
+#game-log::-webkit-scrollbar { width: 6px; }
+#game-log::-webkit-scrollbar-thumb { background: #1c2b20; }
+
+.log-line {
+    white-space: pre-wrap;
+}
+.log-line.typing::after {
+    content: '█';
+    margin-left: 2px;
+    animation: blinkCursor 0.8s steps(1) infinite;
+}
+@keyframes blinkCursor {
+    50% { opacity: 0; }
+}
+
+/* ---------- Status box ---------- */
+
+#status-box {
+    margin-top: 12px;
+    padding: 6px 20px;
+    background: linear-gradient(#3a3d3f, #202224);
+    border: 2px solid #55585a;
+    border-radius: 4px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
+}
+#status-text {
+    font-size: 14px;
+    margin: 4px 0;
+    text-align: center;
+}
+
+/* ---------- Popup ---------- */
 
 #win-lose-popup {
     display: none;
@@ -37,66 +360,22 @@
     width: 200px;
     height: 100px;
     z-index: 1000;
-    background: rgb(255, 255, 255);
     justify-content: center;
     align-items: center;
-  }
+    background: linear-gradient(#2b2e30, #17181a);
+    border: 2px solid #c9a24b;
+    color: #e8e4d0;
+    font-family: 'Black Ops One', sans-serif;
+    box-shadow: 0 0 30px rgba(0,0,0,0.7);
+}
 #win-lose-popup > h1 {
     display: flex;
     align-self: center;
     justify-self: center;
+    font-size: 16px;
 }
 #win-lose-popup > button {
     display: flex;
     align-self: center;
     justify-self: center;
-}
-#game-log {
-    width: 250px;
-    height: 400px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    word-wrap: break-word;
-  }
-body { 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.subcontainer{
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-}
-
-.cell {
-    width: 40px;
-    height: 40px;
-    border: 1px solid black;
-    cursor: pointer;
-}
-
-.ship-cell {
-    background: gray;
-}
-.ship-piece{
-    background: gray; 
-    border: 1px solid black; 
-    box-sizing: border-box;
-}
-
-.hit {
-    background: red;
-}
-
-.miss {
-    background: blue;
-}
-.water{
-    background: darkblue;
-    border: 1px solid black;
-}
-.ghost-cell {
-    outline: 3px solid limegreen;
-    outline-offset: -3px;
 }

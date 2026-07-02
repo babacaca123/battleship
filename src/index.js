@@ -16,8 +16,6 @@ playButton.addEventListener('click', () => {
     renderBoard(human.gameboard, document.getElementById('player-board'));
     renderBoard(computer.gameboard, document.getElementById('computer-board'));
     renderShipContainer(shipContainer, SHIP_LENGTHS);
-    // shipsPlaced(shipContainer);
-    
     
     
     
@@ -25,6 +23,3 @@ playButton.addEventListener('click', () => {
 
 });
 
-
-
-// does this not live in state????

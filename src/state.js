@@ -1,7 +1,6 @@
 import Gameboard from "./gameboard.js"
 import Player from "./player.js"
 import { renderLogEntry, updateCell, getCellElement} from "./dom.js";
-import { shipContainer } from "./index.js";
 
 
 
@@ -21,6 +20,8 @@ const winnerPopup = document.getElementById('win-lose-popup');
 const winnerText = winnerPopup.children[0]
 
 const SHIP_LENGTHS = [5, 4, 3, 3, 2];
+
+const SHIP_SKINS = ['ship-5', 'ship-4', 'submarine', 'cruiser', 'ship-2'];
 
 
 
@@ -67,7 +68,7 @@ function checkAllShipsPlaced(shipContainer){
     const hasShips = !!shipContainer.querySelector('.ship-piece')
 
     if (!hasShips) {
-        shipContainer.style.display = 'none';
+        shipContainer.classList.add('hidden');
         inputLocked = false;
     }
 
@@ -117,7 +118,7 @@ function handleTurn(x, y, gameboard, cell, isEnemyBoard){
             gameOver = true;
         }
         inputLocked = false;
-      }, 1);
+      }, 1500);
 
 }
 
@@ -130,4 +131,4 @@ gameboard.computerPlaceShips(computer.gameboard);
 
 
 
-export { human, computer, handleTurn, inputLocked, SHIP_LENGTHS, checkAllShipsPlaced };
+export { human, computer, handleTurn, inputLocked, SHIP_LENGTHS, SHIP_SKINS, checkAllShipsPlaced };
