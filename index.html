@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+<script defer src="bundle.js"></script></head>
+<body>
+    <div id="start-screen">
+        <h1>BATTLESHIP</h1>
+        <button id="play-btn">Play!</button>
+    </div>
+    <div id="playing-screen">
+        <div id="boards-container">
+            <div class="subcontainer">
+                <div id="computer-board"></div>
+            <div id="game-log"></div>
+            </div>
+            <div class="subcontainer">
+                <div id="player-board"></div>
+            <div id="ship-container"></div>
+            
+        </div>
+        <div id="status-box">
+            <h1 id="status-text">Start by placing your ships on the board!
+                 Hold shift to rotate the ship</h1>
+        </div>
+            
+        </div>
+        
+        
+        <div id="win-lose-popup">
+            <h1>You Win!</h1>
+            <button onclick="window.location.reload();">Exit</button>
+
+        </div>
+    </div>
+
+    
+</body>
+</html>
